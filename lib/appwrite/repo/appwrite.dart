@@ -12,8 +12,9 @@ class AppWrite {
 
   AppWrite._internal() {
     client = Client()
-        .setEndpoint(AppwriteConst.endpoint)
-        .setProject(AppwriteConst.projectId)
-        .setSelfSigned(status: AppwriteConst.selfSignedIn);
+            .setEndpoint(AppwriteConst.endpoint)
+            .setProject(AppwriteConst.projectId)
+        //.setSelfSigned(status: AppwriteConst.selfSignedIn)
+        ;
   }
 }

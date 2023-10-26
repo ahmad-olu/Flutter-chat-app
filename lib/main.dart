@@ -4,6 +4,7 @@ import 'package:flutter_chat_app/appwrite/main.dart';
 import 'package:flutter_chat_app/bloc_observer.dart';
 
 void main() {
+  WidgetsFlutterBinding.ensureInitialized();
   Bloc.observer = SimpleBlocObserver();
   runApp(const MainApp());
 }

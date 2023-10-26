@@ -11,10 +11,10 @@ class AuthRepo {
     try {
       return await _account.get();
     } on AppwriteException catch (e, _) {
-      log(e.toString());
+      //log(e.toString());
       throw AppwriteException(e.message, e.code);
     } catch (e) {
-      log(e.toString());
+      //log(e.toString());
       throw Exception(e);
     }
   }

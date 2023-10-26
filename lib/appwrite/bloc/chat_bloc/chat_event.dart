@@ -4,9 +4,9 @@ part of 'chat_bloc.dart';
 sealed class ChatEvent {}
 
 final class GetAllChat extends ChatEvent {
-  final List<Chat> chats;
+  //final List<Chat> chats;
 
-  GetAllChat({required this.chats});
+  GetAllChat();
 }
 
 final class AddChat extends ChatEvent {
@@ -16,7 +16,7 @@ final class AddChat extends ChatEvent {
 }
 
 final class DeleteChat extends ChatEvent {
-  final Chat chat;
+  final String chatId;
 
-  DeleteChat({required this.chat});
+  DeleteChat({required this.chatId});
 }

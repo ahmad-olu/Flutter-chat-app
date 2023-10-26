@@ -12,7 +12,7 @@ final class AppLogoutRequested extends AuthEvent {
 }
 
 final class AppUserChanged extends AuthEvent {
-  const AppUserChanged(this.user);
+  const AppUserChanged();
 
-  final User? user;
+  // final User? user;
 }

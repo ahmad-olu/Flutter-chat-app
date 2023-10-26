@@ -6,13 +6,13 @@ class Chat {
   final String userId;
   final String name;
   DateTime? createdAt;
-  String id;
+  String? id;
   final String message;
   Chat({
     required this.userId,
     required this.name,
     this.createdAt,
-    required this.id,
+    this.id,
     required this.message,
   });
 
@@ -44,9 +44,9 @@ class Chat {
     return Chat(
       userId: map['userId'] ?? '',
       name: map['name'] ?? '',
-      createdAt: map['\$createdAt'] != null
-          ? DateTime.fromMillisecondsSinceEpoch(map['\$createdAt'])
-          : null,
+      // createdAt: map['\$createdAt'] != null
+      //     ? DateTime.fromMillisecondsSinceEpoch(map['\$createdAt'])
+      //     : null,
       id: map['\$id'] ?? '',
       message: map['message'] ?? '',
     );
