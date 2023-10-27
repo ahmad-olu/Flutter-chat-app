@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:flutter_chat_app/appwrite/bloc/auth_bloc/auth_bloc.dart';
 import 'package:flutter_chat_app/appwrite/bloc/login_and_register_cubit/login_and_register_cubit.dart';
 import 'package:flutter_chat_app/appwrite/repo/auth_repo.dart';
+import 'package:flutter_chat_app/appwrite/repo/realtime.dart';
 import 'package:flutter_chat_app/appwrite/view/chat_view.dart';
 
 class LoginAndRegisterPage extends StatelessWidget {
@@ -9,9 +11,16 @@ class LoginAndRegisterPage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return BlocProvider(
-      create: (context) =>
-          LoginAndRegisterCubit(authRepository: context.read<AuthRepo>()),
+    return MultiBlocProvider(
+      providers: [
+        BlocProvider.value(
+          value: BlocProvider.of<AuthBloc>(context),
+        ),
+        BlocProvider(
+          create: (context) =>
+              LoginAndRegisterCubit(authRepository: context.read<AuthRepo>()),
+        ),
+      ],
       child: const LoginAndRegisterForm(),
     );
   }
@@ -25,12 +34,12 @@ class LoginAndRegisterForm extends StatelessWidget {
     return BlocConsumer<LoginAndRegisterCubit, LoginAndRegisterState>(
       listener: (context, state) {
         if (state.status == LoginAndRegisterStatus.submitted) {
-          Navigator.push<void>(
-            context,
-            MaterialPageRoute<void>(
-              builder: (BuildContext context) => const ChatPage(),
-            ),
-          );
+          Navigator.pushAndRemoveUntil(
+              context,
+              MaterialPageRoute<void>(
+                builder: (BuildContext context) => const ChatPage(),
+              ),
+              (route) => false);
           ScaffoldMessenger.of(context)
             ..hideCurrentSnackBar()
             ..showSnackBar(
@@ -62,7 +71,7 @@ class LoginAndRegisterForm extends StatelessWidget {
                 children: [
                   const SizedBox(height: 8),
                   TextField(
-                    enabled: state.status == LoginAndRegisterStatus.submitting,
+                    enabled: state.status != LoginAndRegisterStatus.submitting,
                     decoration: const InputDecoration(
                       labelText: 'name',
                     ),
@@ -71,7 +80,7 @@ class LoginAndRegisterForm extends StatelessWidget {
                   ),
                   const SizedBox(height: 8),
                   TextField(
-                    enabled: state.status == LoginAndRegisterStatus.submitting,
+                    enabled: state.status != LoginAndRegisterStatus.submitting,
                     decoration: const InputDecoration(
                       labelText: 'email',
                     ),
@@ -80,7 +89,7 @@ class LoginAndRegisterForm extends StatelessWidget {
                   ),
                   const SizedBox(height: 8),
                   TextField(
-                    enabled: state.status == LoginAndRegisterStatus.submitting,
+                    enabled: state.status != LoginAndRegisterStatus.submitting,
                     obscureText: true,
                     decoration: const InputDecoration(
                       labelText: 'password',

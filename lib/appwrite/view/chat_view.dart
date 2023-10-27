@@ -3,6 +3,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_chat_app/appwrite/bloc/auth_bloc/auth_bloc.dart';
 import 'package:flutter_chat_app/appwrite/bloc/chat_bloc/chat_bloc.dart';
 import 'package:flutter_chat_app/appwrite/model/chat.dart';
+import 'package:flutter_chat_app/appwrite/repo/auth_repo.dart';
 import 'package:flutter_chat_app/appwrite/repo/db_repo.dart';
 import 'package:flutter_chat_app/appwrite/repo/realtime.dart';
 import 'package:flutter_chat_app/appwrite/view/login_and_register_page.dart';
@@ -14,11 +15,18 @@ class ChatPage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return BlocProvider(
-      create: (context) => ChatBloc(
-        context.read<DbRepo>(),
-        context.read<RealRepo>(),
-      )..add(GetAllChat()),
+    return MultiBlocProvider(
+      providers: [
+        BlocProvider.value(
+          value: BlocProvider.of<AuthBloc>(context),
+        ),
+        BlocProvider(
+          create: (context) => ChatBloc(
+            context.read<DbRepo>(),
+            context.read<RealRepo>(),
+          )..add(GetAllChat()),
+        ),
+      ],
       child: const ChatView(),
     );
   }
@@ -32,12 +40,12 @@ class ChatView extends StatelessWidget {
     return BlocListener<AuthBloc, AuthState>(
       listener: (context, state) {
         if (state.status == AuthStatus.unauthenticated) {
-          Navigator.push<void>(
-            context,
-            MaterialPageRoute<void>(
-              builder: (BuildContext context) => const LoginAndRegisterPage(),
-            ),
-          );
+          Navigator.pushAndRemoveUntil(
+              context,
+              MaterialPageRoute<void>(
+                builder: (BuildContext context) => const LoginAndRegisterPage(),
+              ),
+              (route) => false);
           ScaffoldMessenger.of(context)
             ..hideCurrentSnackBar()
             ..showSnackBar(

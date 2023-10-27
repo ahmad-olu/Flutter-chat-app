@@ -4,6 +4,7 @@ import 'dart:developer';
 import 'package:appwrite/appwrite.dart';
 import 'package:bloc/bloc.dart';
 import 'package:equatable/equatable.dart';
+import 'package:flutter_chat_app/appwrite/const/appwrite_const.dart';
 import 'package:flutter_chat_app/appwrite/model/chat.dart';
 import 'package:flutter_chat_app/appwrite/repo/db_repo.dart';
 import 'package:flutter_chat_app/appwrite/repo/realtime.dart';
@@ -20,11 +21,6 @@ class ChatBloc extends Bloc<ChatEvent, ChatState> {
     on<AddChat>(_onAddChat);
     on<DeleteChat>(_onDeleteChat);
     on<GetAllChat>(_onGetAllChat);
-    // _chatSubscription = _realRepo.getChat().stream.listen((event) {
-    //   log('this part');
-    //   log(event.toString());
-    //   //add(AppUserChanged(event));
-    // });
   }
 
   _onAddChat(AddChat event, Emitter<ChatState> emit) async {
@@ -64,6 +60,20 @@ class ChatBloc extends Bloc<ChatEvent, ChatState> {
     try {
       final chats = await _dbRepo.getChatsFuture();
       emit(state.copyWith(status: ChatStatus.loaded, chats: chats));
+
+      await emit.forEach(
+        _realRepo.getChat().stream,
+        onData: (data) {
+          if (data.events.contains(
+            'databases.*.collections.${AppwriteConst.chatCollectionId}.documents.*.create',
+          )) {
+            final chat = Chat.fromMap(data.payload);
+
+            return state.copyWith(chats: [chat, ...state.chats]);
+          }
+          return state;
+        },
+      );
     } on AppwriteException catch (e, _) {
       log(': ${e.message}');
       emit(state.copyWith(
@@ -75,10 +85,4 @@ class ChatBloc extends Bloc<ChatEvent, ChatState> {
       emit(state.copyWith(status: ChatStatus.error, errorMessage: null));
     }
   }
-
-  // @override
-  // Future<void> close() {
-  //   _chatSubscription.cancel();
-  //   return super.close();
-  // }
 }
